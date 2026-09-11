@@ -1,0 +1,67 @@
+# IMS run-to-failure RUL configuration (Case Study 2, Sections 5-6).
+# Requires the IMS bearing dataset (NASA/U. Cincinnati). See README for the
+# official source and placement. Falls back to a documented synthetic
+# run-to-failure stand-in when the raw data is absent.
+dataset: ims
+task: prognosis
+seed: 42
+device: auto
+
+paths:
+  raw_dir: data/raw/ims                 # place IMS test folders here
+  processed_dir: data/processed/ims
+  splits_dir: data/splits/ims
+  checkpoint_dir: checkpoints/ims
+  output_dir: outputs
+
+ims:
+  sampling_rate: 20000                  # 20 kHz IMS accelerometers
+  bearing: Rexnord-ZA2115
+  window_size: 2048
+  allow_synthetic_fallback: true
+  # IMS records are 1-second snapshots taken every ~10 min; each file is one step.
+  smoothing_window: 5                   # moving-average smoothing of health index
+
+preprocess:
+  window_size: 2048
+  overlap: 0.5
+  stft_size: 64
+  n_features: 4
+  standardize: true
+
+split:
+  regime: by_unit                       # split by bearing unit (no leakage)
+  train_units: null                     # null -> auto (first 70% of units by id)
+  test_frac: 0.30
+
+model:
+  name: pinn_pdm
+  conv_filters: [16, 32, 64]
+  lstm_hidden: 128
+  lstm_layers: 2
+  embed_dim: 128
+  head_dim: 64
+  dropout: 0.3
+  seq_len: 8                            # sequence of consecutive windows for LSTM
+
+training:
+  epochs: 40
+  batch_size: 32
+  lr: 0.001
+  weight_decay: 0.0
+  optimizer: adam
+  scheduler: cosine
+  early_stopping_patience: 10
+  grad_clip: 5.0
+  num_workers: 0
+
+physics:
+  lambda_phys: 1.0           # degradation ODE residual
+  lambda_mono: 1.0           # monotonicity
+  lambda_spec: 0.0           # prognosis task: no spectral term
+  adaptive: true
+  adaptive_method: gradnorm
+  adaptive_alpha: 0.12
+  adaptive_init: 0.1
+  adaptive_target_ratio: 0.25
+  rho_init: 1.0

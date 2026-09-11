@@ -1,0 +1,55 @@
+# NASA C-MAPSS FD001 RUL configuration (OPTIONAL / stretch, Case Study 2 6.6).
+# Requires the C-MAPSS FD001 text files. Falls back to a synthetic multivariate
+# degradation stand-in when absent. This module is optional -- the core project
+# runs without it.
+dataset: cmapps
+subset: FD001
+task: prognosis
+seed: 42
+device: auto
+
+paths:
+  raw_dir: data/raw/cmapss              # place train_FD001.txt etc. here
+  processed_dir: data/processed/cmapss
+  splits_dir: data/splits/cmapss
+  checkpoint_dir: checkpoints/cmapss
+  output_dir: outputs
+
+cmapss:
+  allow_synthetic_fallback: true
+  rul_clip: 125                         # piecewise-linear RUL cap (standard for FD001)
+  sensors_drop: [1, 5, 6, 10, 16, 18, 19]   # near-constant sensors in FD001
+  window_size: 30                       # time-window length (cycles)
+  window_stride: 1
+
+preprocess:
+  standardize: true
+
+model:
+  name: pinn_pdm_mlp                    # tabular multivariate variant
+  hidden: [128, 128, 64]
+  dropout: 0.3
+
+training:
+  epochs: 40
+  batch_size: 128
+  lr: 0.001
+  weight_decay: 0.0
+  optimizer: adam
+  scheduler: cosine
+  early_stopping_patience: 10
+  grad_clip: 5.0
+  num_workers: 0
+
+physics:
+  # C-MAPSS RUL is piecewise-LINEAR, so the exponential ODE prior is only a rough
+  # fit (Case Study limitation: "first-order exponential; multi-stage may fit
+  # better"). We down-weight the ODE and rely mainly on the monotonicity prior,
+  # which is always valid (health should not recover).
+  lambda_phys: 0.05
+  lambda_mono: 0.3
+  lambda_spec: 0.0
+  adaptive: false
+  adaptive_method: gradnorm
+  adaptive_alpha: 0.12
+  rho_init: 0.5

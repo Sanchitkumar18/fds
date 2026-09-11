@@ -1,0 +1,14 @@
+# Core scientific stack (Python 3.10+ recommended; runs on 3.9 via
+# `from __future__ import annotations` used throughout the codebase).
+torch>=2.0
+numpy>=1.23
+pandas>=1.5
+scipy>=1.9
+scikit-learn>=1.1
+matplotlib>=3.6
+seaborn>=0.12
+tqdm>=4.64
+PyYAML>=6.0
+pytest>=7.0
+# Optional: enables TensorBoard logging (the code falls back to CSV if absent).
+tensorboard>=2.10
