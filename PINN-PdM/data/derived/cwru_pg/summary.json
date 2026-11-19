@@ -1,0 +1,67 @@
+{
+ "windows": 4643,
+ "recordings": 40,
+ "per_class": {
+  "normal": 409,
+  "inner": 1410,
+  "outer": 1413,
+  "ball": 1411
+ },
+ "per_load": {
+  "0": 1116,
+  "1": 1175,
+  "2": 1174,
+  "3": 1178
+ },
+ "evidence_acc_fault_all": 0.6596598960793576,
+ "evidence_acc_by_class": {
+  "inner": 0.7439716312056738,
+  "outer": 0.726822363765039,
+  "ball": 0.5081502480510276
+ },
+ "evidence_acc_by_load": {
+  "0": 0.6880907372400756,
+  "1": 0.665406427221172,
+  "2": 0.6442762535477767,
+  "3": 0.6409048067860509
+ },
+ "evidence_acc_by_severity": {
+  "0.007": 0.8271954674220963,
+  "0.014": 0.48332150461320084,
+  "0.021": 0.6680820948336872
+ },
+ "stress": {
+  "noise_10dB": {
+   "windows": 1178,
+   "evidence_acc_fault": 0.6277097078228087
+  },
+  "noise_5dB": {
+   "windows": 1178,
+   "evidence_acc_fault": 0.6173421300659755
+  },
+  "noise_0dB": {
+   "windows": 1178,
+   "evidence_acc_fault": 0.6060320452403393
+  },
+  "noise_-5dB": {
+   "windows": 1178,
+   "evidence_acc_fault": 0.5805843543826579
+  },
+  "speed_x0.95": {
+   "windows": 1178,
+   "evidence_acc_fault": 0.6163996229971724
+  },
+  "speed_x1.05": {
+   "windows": 1120,
+   "evidence_acc_fault": 0.643211100099108
+  },
+  "speed_fluct5pct": {
+   "windows": 1177,
+   "evidence_acc_fault": 0.5783018867924529
+  }
+ },
+ "unused_windows": {
+  "indist": 320,
+  "xload": 120
+ }
+}

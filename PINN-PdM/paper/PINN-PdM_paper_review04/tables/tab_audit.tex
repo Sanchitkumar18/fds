@@ -1,0 +1,23 @@
+\begin{table}[t]
+\caption{Audit of the spectral-consistency term on the CWRU 0--2\,hp training windows (measured, no training involved).}
+\label{tab:audit}
+\centering
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Quantity & v1 (64-bin STFT) & raw, 5.9\,Hz & envelope, 5.9\,Hz \\
+\midrule
+Bin width (Hz) & 95.2 & 5.9 & 5.9 \\
+Physics-only fault-type acc.\ (\%) & 32.3 & 33.3 & 66.4 \\
+\quad inner recall (\%) & 88.9 & 100.0 & 74.5 \\
+\quad outer recall (\%) & 8.0 & 0.0 & 74.5 \\
+\quad ball recall (\%) & 0.0 & 0.0 & 50.3 \\
+\midrule
+\multicolumn{4}{l}{\emph{Gradient of the loss w.r.t.\ logits (random logits, 512 windows)}} \\
+Mean $|\partial L/\partial z_{\mathrm{healthy}}|$ & 1.9e-06 & \multicolumn{2}{c}{v2: 0.0 (exact)} \\
+Mean $|\partial L/\partial z_{\mathrm{fault}}|$ & 1.2e-06 & \multicolumn{2}{c}{v2: 1.1e-04} \\
+Faulty windows pushed toward healthy (\%) & 63.5 & \multicolumn{2}{c}{v2: 0.0} \\
+True fault logit raised by descent (\%) & -- & \multicolumn{2}{c}{v2 (envelope): 76.0} \\
+\bottomrule
+\end{tabular}
+\end{table}

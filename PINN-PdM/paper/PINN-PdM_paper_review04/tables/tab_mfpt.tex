@@ -1,0 +1,22 @@
+\begin{table}[t]
+\caption{Second bearing dataset (MFPT, \emph{preliminary}): faults trained at 0--150\,lbs, tested at 270--300\,lbs. Measured; $n$ = number of completed seeds (CI from $n$ seeds; no CI is meaningful for $n=2$).}
+\label{tab:mfpt}
+\centering
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Model & $n$ & Test acc.\ (\%) & Macro-F1 (\%) \\
+\midrule
+Random forest (12 features) & 5 & 29.9\,$\pm$\,0.0 & 29.8\,$\pm$\,0.0 \\
+SVM-RBF (12 features) & 5 & 29.3\,$\pm$\,0.0 & 29.0\,$\pm$\,0.0 \\
+CNN & 3 & 30.2\,$\pm$\,2.0 & 32.4\,$\pm$\,8.6 \\
+CNN--LSTM ($\lambda=0$) & 3 & 39.2\,$\pm$\,21.5 & 41.2\,$\pm$\,26.5 \\
+\midrule
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ raw spectrum, adaptive & 3 & 34.5\,$\pm$\,16.9 & 36.2\,$\pm$\,12.2 \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope, adaptive & 2 & 33.3\,$\pm$\,17.3 & 37.1\,$\pm$\,59.0 \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope, fixed $\lambda=0.5$ & 2 & 32.7\,$\pm$\,17.3 & 36.3\,$\pm$\,60.4 \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope + unlabelled target$^{\dagger}$ & 2 & 100.0\,$\pm$\,0.0 & 100.0\,$\pm$\,0.0 \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}\parbox{\columnwidth}{\scriptsize $^{\dagger}$Transductive (unlabelled target inputs used in training).}
+\end{table}

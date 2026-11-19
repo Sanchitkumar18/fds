@@ -1,0 +1,16 @@
+\begin{table}[t]
+\caption{Single-source extrapolation on CWRU: train on 0\,hp only, test on 3\,hp (measured, 5 seeds).}
+\label{tab:single}
+\centering
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Model & Test acc.\ (\%) & Macro-F1 (\%) & $\Delta$ ($p$) \\
+\midrule
+CNN--LSTM ($\lambda=0$) & 87.1\,$\pm$\,6.2 & 88.2\,$\pm$\,6.0 & -- \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ raw spectrum, adaptive & 88.2\,$\pm$\,4.4 & 89.5\,$\pm$\,4.5 & +1.05 (0.621) \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope, adaptive & 86.9\,$\pm$\,4.8 & 88.1\,$\pm$\,4.9 & -0.24 (0.825) \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope + unlabelled target$^{\dagger}$ & 83.3\,$\pm$\,6.5 & 73.8\,$\pm$\,19.2 & -3.79 (0.369) \\
+\bottomrule
+\end{tabular}
+\end{table}

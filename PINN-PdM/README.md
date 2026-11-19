@@ -222,3 +222,57 @@ NASA IMS / C-MAPSS repositories.
 
 *Authors: Vaishvi Verma (23BCE0016), Tanishq Garg (23BCE0094), Sanchit Kumar (23BCE0043).
 Guide: Prof. Kalyanaraman P, SCOPE, VIT Vellore.*
+
+---
+
+## Review-03: real-data evaluation (CWRU + MFPT)
+
+The Review-03 manuscript (`paper/main.tex`) reports **only** results measured on the
+original recordings; the synthetic fallback is not used anywhere in it.
+
+**Data (not committed; see `.gitignore`)**
+
+- `data/raw/cwru/<id>.mat`: 40 CWRU 12 kHz drive-end files, downloaded from
+  `https://engineering.case.edu/sites/default/files/<id>.mat`:
+  Normal 97–100; IR 105–108, 169–172, 209–212; Ball 118–121, 185–188, 222–225;
+  OR@6 130–133, 197–200, 234–237.
+- `data/raw/mfpt/*.mat`: MFPT bearing data. The official MFPT page no longer hosts it;
+  we used the Figshare mirror `https://ndownloader.figshare.com/files/53038079`
+  (MFPT.zip, md5 `6b86b707f2ab711782492f0dfff0b818`), unzipped in place.
+
+**Run**
+
+```bash
+python scripts/run_review03.py --exp all     # audit + every protocol/config/seed (resumable)
+python scripts/make_review03_tables.py       # paper/tables/*.tex from outputs/review03/summary.json
+python scripts/make_review03_figs.py         # paper/figs/*_real.png, robustness, sensitivity
+pytest tests/                                # includes leakage + L_spec gradient tests
+```
+
+**Protocols:** the split is made *before* windowing (`src/review03/data_real.py`).
+- In-distribution: time blocks of 70/15/15% per recording, with a guard gap.
+- Cross-load (0/1/2→3 hp and 0→3 hp): whole 3 hp recordings form the test set.
+- MFPT: faults at 0–150 lbs for training, 270/300 lbs for testing.
+
+`assert_no_overlap` fails if any two windows from different splits share a sample.
+
+**Spectral term:** `src/review03/spectral.py` contains the Review-02 form (v1), kept only
+for the audit, and the revised form (v2):
+- v2 uses a high-resolution raw or squared-envelope spectrum.
+- Each class mask has the same total mass.
+- The fault-type distribution ignores the healthy logit, and the window weight uses
+  stop-gradient.
+
+Each run is cached at `outputs/review03/runs/<exp>/<config>__seed<k>.json`.
+
+### CWRU-PG derived dataset and ablations (faculty request)
+
+```bash
+python scripts/build_derived_dataset.py    # -> data/derived/cwru_pg/ (~100 MB, <1 min CPU)
+python scripts/evidence_sensitivity.py     # training-free sigma/H sensitivity
+```
+
+- CWRU-PG is derived from the 40 real CWRU recordings; no signals are synthesised. See
+  `data/derived/cwru_pg/DATASHEET.md`.
+- The paper's *Ablation Studies* section (Table "ablation") is computed from the saved
+  per-seed runs in `outputs/review03/runs/`; producing it needs no retraining.

@@ -1,0 +1,27 @@
+\begin{table}[t]
+\caption{Leakage-controlled protocols: windows (recordings) per split. Splits are formed before windowing; no two windows in different splits share a sample.}
+\label{tab:protocols}
+\centering
+\footnotesize
+\begin{tabular}{llccc}
+\toprule
+Protocol & Split & Windows & Recordings & Loads \\
+\midrule
+CWRU in-dist. & train & 3118 & 40 & 0,1,2,3 \\
+ & val & 631 & 40 & 0,1,2,3 \\
+ & test & 631 & 40 & 0,1,2,3 \\
+\midrule
+CWRU 0/1/2$\to$3 hp & train & 2887 & 30 & 0,1,2 \\
+ & val & 471 & 30 & 0,1,2 \\
+ & test & 1178 & 10 & 3 \\
+\midrule
+CWRU 0$\to$3 hp & train & 929 & 10 & 0 \\
+ & val & 151 & 10 & 0 \\
+ & test & 1178 & 10 & 3 \\
+\midrule
+MFPT load shift & train & 208 & 7 & 0,25,50,150,270 \\
+ & val & 33 & 7 & 0,25,50,150,270 \\
+ & test & 147 & 4 & 270,300 \\
+\bottomrule
+\end{tabular}
+\end{table}

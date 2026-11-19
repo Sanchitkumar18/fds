@@ -1,0 +1,17 @@
+\begin{table*}[t]
+\caption{Robustness on the held-out 3\,hp recordings: additive white noise at the given SNR and emulated speed change (time-warp). Accuracy, \% (measured, 5 seeds; models trained on clean 0--2\,hp data only).}
+\label{tab:robust}
+\centering
+\footnotesize
+\begin{tabular}{lccccccc}
+\toprule
+Model & 10 dB & 5 dB & 0 dB & -5 dB & $\times0.95$ & $\times1.05$ & $\pm5\%$ \\
+\midrule
+Random forest (12 features) & 94.0\,$\pm$\,0.4 & 82.5\,$\pm$\,5.4 & 54.9\,$\pm$\,7.1 & 58.3\,$\pm$\,4.1 & 61.6\,$\pm$\,0.5 & 70.3\,$\pm$\,0.7 & 62.8\,$\pm$\,0.3 \\
+CNN--LSTM ($\lambda=0$) & 99.4\,$\pm$\,0.7 & 97.5\,$\pm$\,1.4 & 83.9\,$\pm$\,10.4 & 50.6\,$\pm$\,12.3 & 78.8\,$\pm$\,15.8 & 96.0\,$\pm$\,4.1 & 94.1\,$\pm$\,4.6 \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ raw spectrum, adaptive & 99.0\,$\pm$\,0.8 & 96.1\,$\pm$\,3.2 & 75.6\,$\pm$\,9.9 & 44.1\,$\pm$\,4.7 & 78.4\,$\pm$\,5.1 & 95.0\,$\pm$\,8.7 & 93.3\,$\pm$\,2.2 \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope, adaptive & 98.2\,$\pm$\,3.6 & 96.9\,$\pm$\,2.3 & 77.1\,$\pm$\,16.3 & 48.7\,$\pm$\,7.4 & 81.1\,$\pm$\,5.3 & 99.4\,$\pm$\,0.3 & 94.5\,$\pm$\,2.8 \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope + unlabelled target$^{\dagger}$ & 89.7\,$\pm$\,0.5 & 89.4\,$\pm$\,2.9 & 80.2\,$\pm$\,15.5 & 46.5\,$\pm$\,7.2 & 72.8\,$\pm$\,13.0 & 92.6\,$\pm$\,3.5 & 87.0\,$\pm$\,2.7 \\
+\bottomrule
+\end{tabular}
+\end{table*}

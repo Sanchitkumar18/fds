@@ -1,0 +1,23 @@
+\begin{table*}[t]
+\caption{Cross-load extrapolation on the original CWRU recordings: train 0/1/2\,hp, test on the unseen 3\,hp recordings (measured).}
+\label{tab:xload}
+\centering
+\footnotesize
+\begin{tabular}{lcccc}
+\toprule
+Model & Val (0--2 hp) & Test acc.\ (3 hp) & Test macro-F1 & $\Delta$ vs.\ CNN--LSTM ($p$) \\
+\midrule
+Random forest (12 features) & -- & 96.6\,$\pm$\,0.1 & 97.2\,$\pm$\,0.1 & -2.67 (0.001) \\
+SVM-RBF (12 features) & -- & 97.2\,$\pm$\,0.0 & 97.7\,$\pm$\,0.0 & -2.05 (0.004) \\
+CNN & 100.0\,$\pm$\,0.0 & 98.7\,$\pm$\,2.0 & 99.0\,$\pm$\,1.7 & -0.51 (0.345) \\
+Transformer & 100.0\,$\pm$\,0.0 & 97.7\,$\pm$\,3.5 & 98.1\,$\pm$\,3.0 & -1.56 (0.315) \\
+CNN--LSTM ($\lambda=0$) & 100.0\,$\pm$\,0.0 & 99.3\,$\pm$\,1.0 & 99.4\,$\pm$\,0.8 & -- \\
+\midrule
++ $L_{\mathrm{spec}}^{\mathrm{v1}}$ (Review-02 form), adaptive & 100.0\,$\pm$\,0.0 & 99.2\,$\pm$\,0.7 & 99.3\,$\pm$\,0.6 & -0.05 (0.890) \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ raw spectrum, adaptive & 100.0\,$\pm$\,0.0 & 99.2\,$\pm$\,0.6 & 99.3\,$\pm$\,0.5 & -0.05 (0.854) \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope, adaptive & 100.0\,$\pm$\,0.0 & 97.6\,$\pm$\,3.5 & 98.0\,$\pm$\,2.9 & -1.63 (0.259) \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope + unlabelled target$^{\dagger}$ & 100.0\,$\pm$\,0.0 & 89.6\,$\pm$\,0.5 & 91.2\,$\pm$\,0.4 & -9.63 ($<$0.001) \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}\parbox{0.95\textwidth}{\scriptsize Mean\,$\pm$\,95\% CI half-width over 5 seeds (\%). $\Delta$: paired mean difference in test accuracy vs.\ CNN--LSTM ($\lambda=0$) on the same seeds, percentage points, with paired $t$-test $p$ in brackets. $^{\dagger}$Transductive: $L_{\mathrm{spec}}$ is also applied to the \emph{unlabelled} target-load inputs; their labels are never used.}
+\end{table*}

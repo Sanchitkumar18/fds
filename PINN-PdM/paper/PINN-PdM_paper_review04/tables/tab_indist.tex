@@ -1,0 +1,21 @@
+\begin{table}[t]
+\caption{In-distribution diagnosis on CWRU with time-blocked 70/15/15 splits of every recording (measured, 5 seeds).}
+\label{tab:indist}
+\centering
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Model & Acc.\ (\%) & Macro-F1 (\%) & Params \\
+\midrule
+Random forest (12 features) & 99.8\,$\pm$\,0.0 & 99.9\,$\pm$\,0.0 & -- \\
+SVM-RBF (12 features) & 99.8\,$\pm$\,0.0 & 99.9\,$\pm$\,0.0 & -- \\
+CNN & 100.0\,$\pm$\,0.0 & 100.0\,$\pm$\,0.0 & 0.57\,M \\
+Transformer & 99.9\,$\pm$\,0.2 & 99.9\,$\pm$\,0.2 & 0.45\,M \\
+CNN--LSTM ($\lambda=0$) & 100.0\,$\pm$\,0.0 & 100.0\,$\pm$\,0.0 & 2.35\,M \\
+\midrule
++ $L_{\mathrm{spec}}^{\mathrm{v1}}$ (Review-02 form), adaptive & 100.0\,$\pm$\,0.0 & 100.0\,$\pm$\,0.0 & 2.35\,M \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ raw spectrum, adaptive & 100.0\,$\pm$\,0.0 & 100.0\,$\pm$\,0.0 & 2.35\,M \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope, adaptive & 100.0\,$\pm$\,0.0 & 100.0\,$\pm$\,0.0 & 2.35\,M \\
+\bottomrule
+\end{tabular}
+\end{table}

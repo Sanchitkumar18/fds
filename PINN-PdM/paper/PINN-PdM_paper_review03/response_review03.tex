@@ -1,0 +1,231 @@
+%=====================================================================
+% Point-by-point response to the Review-03 comments (Group 09).
+% Compile with pdflatex. Numbers quoted here are those of the revised
+% manuscript (paper/main.tex, tables generated from outputs/review03).
+%=====================================================================
+\documentclass[11pt]{article}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\Lspec}{L_{\mathrm{spec}}}
+\newenvironment{comment}{\par\medskip\noindent\begin{minipage}{\linewidth}\itshape\color{black!70}}{\end{minipage}\par\smallskip}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+\begin{document}
+
+\begin{center}
+{\Large\bfseries Response to Review-03 comments}\\[4pt]
+Characteristic-Frequency-Guided Spectral Priors for Rolling-Element Bearing Fault Diagnosis\\
+V.~Verma, T.~Garg, S.~Kumar, K.~P (Group 09)
+\end{center}
+
+We thank the reviewer for a careful and constructive assessment. Every
+criticism was valid, and addressing them changed the paper's conclusions. In
+summary:
+\begin{itemize}[leftmargin=*]
+\item All results now come from the \textbf{original CWRU recordings} (40 files)
+and a \textbf{second dataset (MFPT)}. The constructed dataset is no longer used
+for any result.
+\item Every split is formed \textbf{before windowing}, and an automated check
+confirms that no two windows in different splits share a sample.
+\item The spectral-consistency term was \textbf{audited} and found to be defective
+in three respects; a corrected version (v2) is derived and unit-tested.
+\item The method is repositioned as a \textbf{physics-guided spectral prior},
+explicitly distinguished from differential-equation PINNs.
+\item All mandatory (P1) experiments were run with \textbf{five seeds}, 95\%
+confidence intervals and paired tests. Of the suggested (P2) items, the
+noise/speed, raw-vs-envelope and band-width/harmonic sensitivity studies are
+complete; the sensitivity is measured on the prior's evidence accuracy without
+retraining. The MFPT classifier results rest on 2--3 seeds and are labelled
+preliminary, but the MFPT evidence analysis is complete and explains them;
+the table in Section~3 states this explicitly.
+\item The measured outcome is \textbf{negative}. On real data the spectral prior
+does not improve cross-load accuracy over the identical network without it, and
+its transductive variant degrades accuracy significantly. The title, abstract,
+contributions and conclusions have been rewritten to say so.
+\item The complete training and evaluation code, configurations and per-seed run
+files are now part of the submission.
+\end{itemize}
+
+%---------------------------------------------------------------------
+\section*{1. Critical methodological weaknesses}
+
+\begin{comment}
+1. The central research claim remains untested. [\dots] The original CWRU
+recordings must be used to establish the proposed contribution.
+\end{comment}
+\textbf{Response.} Agreed. We downloaded the 40 standard 12\,kHz drive-end
+recordings from the CWRU Bearing Data Center: normal baselines 97--100, and
+inner-race, ball and outer-race (@6:00) faults of 0.007/0.014/0.021\,in at
+0--3\,hp. The 48\,kHz normal baselines are decimated to 12\,kHz, and the recorded
+shaft speed of each file is used for its characteristic frequencies. Every
+diagnosis result in the revised paper (Tables~VI--XII) is measured on these
+recordings. \emph{Changes:} Sections~IV and VII, Tables~III--XII.
+
+\begin{comment}
+2. The synthetic experiment risks circular validation. [\dots]
+\end{comment}
+\textbf{Response.} Agreed. The constructed signals were generated from the same
+defect-frequency relations that the loss rewards, so success on them only showed
+compatibility with the assumed model. We removed the constructed data from all
+evaluations and added a paragraph (Section~IV-D) explaining why it cannot support
+a robustness claim. The real-data results confirm the reviewer's concern: on real
+recordings the prior conflicts with the labels for a large share of windows,
+which never happened on the constructed data. One example: envelope evidence alone
+identifies the fault type of only 66\% of the 0--2\,hp training windows (ball
+faults 50\%). \emph{Changes:} Section~IV-D; Table~IV.
+
+\begin{comment}
+3. The spectral-consistency loss needs closer examination. [\dots] verify that
+this normalization, the healthy-class zero mask and gradient propagation produce
+the intended optimization behaviour.
+\end{comment}
+\textbf{Response.} We performed this verification. It showed that the original
+term did \emph{not} behave as intended (Section~V-B, Table~IV):
+\begin{enumerate}[leftmargin=*]
+\item \emph{Normalised frequency input.} The term used the time-summed $64\times64$
+STFT image, whose rows are 95\,Hz apart. All defect harmonics (up to 487\,Hz)
+fall in its lowest six rows, and log compression flattens them. Used on its own,
+it identifies the fault type of 32\% of fault windows, which is chance level. Its
+gradient is about $10^{-6}$ per logit, so the adaptive weight inflated to
+$\bar\lambda\approx40$ during training.
+\item \emph{Healthy-class zero mask and gradient.} The zero mask does not make the
+term neutral to the healthy class. Its window weight
+$w_b=\sum_{c\in\text{faults}}p_{bc}$ is differentiable, so windows that align
+worse than the batch average are pushed toward ``healthy''. This happens for
+64\% of the faulty training windows.
+\item \emph{Mixture normalisation.} Normalising the probability-weighted mask
+mixture couples each class's pull to its discretised mask mass (3.2 for
+inner/outer vs.\ 2.3 for ball).
+\end{enumerate}
+The revised term (v2, Eq.~(7)) makes three changes:
+\begin{itemize}[leftmargin=*]
+\item it uses a 5.9\,Hz-resolution raw or squared-envelope spectrum computed from the window;
+\item it gives every class mask the same total mass;
+\item it uses the fault-type softmax over fault logits only, with a stop-gradient window weight.
+\end{itemize}
+As a result $\partial\Lspec/\partial z_{\mathrm{healthy}}=0$ exactly, and among
+fault types probability moves toward the type with stronger evidence. Both
+properties are checked by unit tests (\texttt{tests/test\_review03.py}). The
+original term is kept only as an ablation row.
+
+\begin{comment}
+4. The physics term may not enforce a genuinely independent physical constraint.
+[\dots] the paper should distinguish it from conventional differential-equation PINNs.
+\end{comment}
+\textbf{Response.} Agreed, and stated explicitly in a new subsection
+(Section~V-D). The term combines a kinematic relation $f_c=r_c f_r$ with the
+observed spectrum of the same input. It is not the residual of a governing
+equation and does not encode resonance dynamics, slip or modulation. We call it
+a physics-\emph{guided spectral prior} throughout and removed ``PINN'' from the
+title and the claims. The closest analogue of PINN collocation points is to apply
+the prior to unlabelled target-condition windows. We evaluated this variant
+separately and labelled it transductive. It reduced 3\,hp accuracy from
+99.25\,$\pm$\,0.95\% to 89.63\,$\pm$\,0.49\% ($p<0.001$), because the envelope
+evidence is wrong for many target windows. The constraint is therefore only as
+reliable as the spectral evidence it relies on.
+
+\begin{comment}
+5. Generalization is not established. A zero accuracy drop on constructed data
+cannot demonstrate robustness when all competing neural models achieve
+essentially perfect accuracy.
+\end{comment}
+\textbf{Response.} Agreed. We no longer claim robustness from the constructed
+data. On real data we report mean\,$\pm$\,95\% CI over five seeds and paired
+$t$-tests against the identical network without physics. We also added harder
+settings where models do not saturate: single-source 0$\to$3\,hp, additive noise
+down to $-5$\,dB, emulated speed change, and MFPT. Under the main 0/1/2$\to$3\,hp
+protocol the CNN--LSTM reaches 99.25\,$\pm$\,0.95\%, and no physics variant
+improves on it significantly. In the robustness tests the largest gain from the
+prior is $+3.4$ points at a $\times1.05$ speed change ($p=0.08$, not significant).
+The paper now states plainly that generalisation benefits are not established.
+
+%---------------------------------------------------------------------
+\section*{2. Dataset and implementation audit}
+
+\begin{comment}
+No executable training script or notebook is included in this archive. [\dots]
+The manuscript should not describe the implementation as fully reproducible
+until the complete training and evaluation code is provided.
+\end{comment}
+\textbf{Response.} The revised archive contains the complete repository:
+\begin{itemize}[leftmargin=*]
+\item data loaders and protocols (\texttt{src/review03/data\_real.py});
+\item losses (\texttt{src/review03/spectral.py});
+\item training loop (\texttt{src/review03/train.py});
+\item experiment runner (\texttt{scripts/run\_review03.py});
+\item table and figure generators;
+\item unit tests;
+\item one JSON file per trained run.
+\end{itemize}
+Every number in the result tables is generated from these run files, with no
+hand-typed values. Section~X gives the exact commands and the data sources,
+including checksums. The paper now notes that GPU (MPS) kernels are not bit-wise
+deterministic.
+
+%---------------------------------------------------------------------
+\section*{3. Mandatory work for Review-03}
+\begin{center}
+\small
+\begin{tabular}{p{0.6cm}p{4.6cm}p{2.0cm}p{8.0cm}}
+\toprule
+Pri. & Required experiment & Status & Outcome (revised paper) \\
+\midrule
+P1 & Original CWRU recordings & Done & 40 recordings, 4 classes; Tables VI--X. \\
+P1 & Train 0/1/2\,hp, test 3\,hp & Done & CNN--LSTM 99.3\,$\pm$\,1.0\%; no physics variant significantly better (Table VII). Harder 0$\to$3\,hp added: 87.1\,$\pm$\,6.2\%, again no significant gain (Table IX). \\
+P1 & CNN--LSTM with vs.\ without physics loss & Done & Identical network, $\lambda=0$ vs.\ v1/v2 raw/v2 envelope/transductive; paired $t$-tests. Envelope $-1.6$ pts ($p=0.26$); transductive $-9.6$ pts ($p<0.001$). \\
+P1 & Fixed vs.\ adaptive weighting & Done & Fixed $\lambda=0.1$ 99.4\%, 0.5 99.1\%, 1.0 98.4\%, adaptive 97.6\%; adaptive balancing is not supported (Table VIII). \\
+P1 & Repeated runs, confidence intervals & Done & 5 seeds, mean\,$\pm$\,95\% CI, paired $t$-test vs.\ baseline in every CWRU table. \\
+\midrule
+P2 & Band-width / harmonic sensitivity & Done (training-free) & Evidence accuracy over $\sigma\in\{2,5,10,20\}$\,Hz, $H\in\{1,3,5\}$: envelope 51--67\% on CWRU 3\,hp, default within 3.1 pts of best; raw $\approx$ chance. The prior is insensitive to its settings but never reliable on CWRU (Table~XII, Sec.~VII-I). \\
+P2 & Noisy and speed-varying signals & Done (speed emulated) & Noise 10 to $-5$\,dB and $\times0.95$/$\times1.05$/$\pm5\%$ time-warp; no significant gain from the prior; best case $+3.4$ pts at $\times1.05$, $p=0.08$ (Table X, Fig.~3). \\
+P2 & Raw vs.\ envelope spectrum & Done & Physics-only fault-type accuracy 33\% (raw) vs.\ 66\% (envelope) (Table IV); in training, raw is neutral and envelope slightly harmful (Table VII). \\
+P2 & Another bearing dataset & Done (classifier runs preliminary) & MFPT load shift: supervised models 29--39\% due to a load/class confound; transductive envelope prior 100\% (2 seeds). Envelope evidence is 100\% correct on MFPT vs.\ 64\% on CWRU, which explains the reversal (Tables XI--XII). \\
+\midrule
+-- & Avoid window-level leakage & Done & Splits made before windowing, guard gaps, automated overlap check (Section IV-C, Table III). \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Window-level leakage.} Splits are formed on the continuous recordings
+before windowing:
+\begin{itemize}[leftmargin=*]
+\item \emph{cross-load protocols:} the whole 3\,hp recordings are the test set;
+\item \emph{in-distribution:} each recording is cut into 70/15/15\% contiguous
+blocks with a one-window guard gap.
+\end{itemize}
+\texttt{assert\_no\_overlap} raises an error if any two windows in different
+splits share a sample, and it runs on every protocol (Table~III). CWRU has one
+recording per class, severity and load. A by-recording split within one load
+would therefore remove a whole fault condition from training, so the
+in-distribution protocol uses time blocks.
+
+%---------------------------------------------------------------------
+\section*{4. Summary of changes to the manuscript}
+\begin{itemize}[leftmargin=*]
+\item Title, abstract, contributions and conclusion rewritten to match the
+measured (negative) results.
+\item Removed: constructed-dataset results, literature-anchored ``target''
+columns, and the claim of full reproducibility without code.
+\item New sections:
+  \begin{itemize}
+  \item data and leakage-controlled protocols (IV);
+  \item audit and revision of $\Lspec$ (V-B, V-C);
+  \item physics-guided prior vs.\ PINN (V-D);
+  \item limitations and threats to validity (VIII);
+  \item reproducibility (X).
+  \end{itemize}
+\item New tables and figures:
+  \begin{itemize}
+  \item protocols, the $\Lspec$ audit, in-distribution, cross-load and single-source results;
+  \item weighting, robustness, sensitivity and MFPT results;
+  \item real-data envelope spectra.
+  \end{itemize}
+\item Added references: Zhao \emph{et al.} (2020) on evaluation leakage; MFPT data.
+\end{itemize}
+
+\end{document}

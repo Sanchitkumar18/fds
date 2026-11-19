@@ -1,0 +1,17 @@
+\begin{table}[t]
+\caption{Fixed vs.\ adaptive weighting of $L_{\mathrm{spec}}^{\mathrm{v2}}$ (envelope), CWRU 0/1/2$\to$3\,hp (measured, 5 seeds).}
+\label{tab:weighting}
+\centering
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+Model & Test acc.\ (\%) & Mean $\lambda$ & $\Delta$ ($p$) \\
+\midrule
+CNN--LSTM ($\lambda=0$) & 99.3\,$\pm$\,1.0 & 0 & -- \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope, fixed $\lambda=0.1$ & 99.4\,$\pm$\,0.4 & 0.1 & +0.17 (0.676) \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope, fixed $\lambda=0.5$ & 99.1\,$\pm$\,0.7 & 0.5 & -0.17 (0.693) \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope, fixed $\lambda=1.0$ & 98.4\,$\pm$\,2.1 & 1 & -0.90 (0.168) \\
++ $L_{\mathrm{spec}}^{\mathrm{v2}}$ envelope, adaptive & 97.6\,$\pm$\,3.5 & 0.905 & -1.63 (0.259) \\
+\bottomrule
+\end{tabular}
+\end{table}

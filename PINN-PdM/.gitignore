@@ -28,3 +28,12 @@ outputs/logs/**
 .DS_Store
 .ipynb_checkpoints/
 .pytest_cache/
+
+# Revised experiment outputs
+outputs/review03/
+
+# Derived datasets (keep generated NPZ files local)
+data/derived/**/*.npz
+
+# macOS metadata
+.DS_Store
